@@ -130,8 +130,10 @@ recursive function으로 directory가 아닌 file이 나올 때까지 호출함.
 ```javascript
   <Highlight language={type}> </Highlight>
 ```
-였으나
+    
+였으나 language가 정상작동하지 않음. 따라서 이 코드를
+```javascript
+  <Highlight className={type}> </Highlight>
 ```
-language가 정상작동하지 
-```ㅇㅏㄴㅎ음.
-```
+으로 바꿔 css에 직접 접근할 수 있도록 수정함.
+
