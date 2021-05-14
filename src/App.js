@@ -74,9 +74,7 @@ const App = () => {
 
                 <Box overflow="auto" width="75%" style={{ backgroundColor: '#011627' }}>
                     {content ? (
-                        <Highlight className={type} style={{ whiteSpace: 'pre-wrap' }}>
-                            {content}
-                        </Highlight>
+                        <Highlight className={type}>{content}</Highlight>
                     ) : (
                         <Box
                             display="flex"
