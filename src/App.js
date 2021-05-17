@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Box, Paper, Dialog, Typography } from '@material-ui/core';
+import { Box, Paper, Dialog, Typography, Button, IconButton } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
-import { ExpandMore, ChevronRight } from '@material-ui/icons';
+import { Folder, InsertDriveFileOutlined, Cancel } from '@material-ui/icons';
 import Highlight from 'react-highlight';
 
 const App = () => {
@@ -12,6 +12,7 @@ const App = () => {
     const [content, setContent] = useState(null);
     const [extension, setExtension] = useState(null);
     const [type, setType] = useState(null);
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -19,10 +20,10 @@ const App = () => {
                 setError(null);
                 setLoading(true);
                 const response = await axios.get(
-                    'https://api.github.com/repos/SausageMania/React-Board/commits',
+                    'https://api.github.com/repos/Vus-2021/Vus-frontend/commits',
                 );
                 setMain(
-                    `https://api.github.com/repos/SausageMania/React-Board/git/trees/${response.data[0].sha}`,
+                    `https://api.github.com/repos/Vus-2021/Vus-frontend/git/trees/${response.data[0].sha}`,
                 );
             } catch (e) {
                 setError(e);
@@ -52,52 +53,62 @@ const App = () => {
     if (loading) return <div>로딩중...</div>;
     if (error) return <div>{error}</div>;
     return (
-        <Dialog open fullWidth maxWidth="lg">
-            <Box width="100%" height="80vh" display="flex" component={Paper}>
-                <Box
-                    overflow="auto"
-                    width="25%"
-                    style={{ backgroundColor: '#F59F00', color: 'white' }}
-                    p={2}
-                >
-                    <TreeView
-                        defaultCollapseIcon={<ExpandMore />}
-                        defaultExpandIcon={<ChevronRight />}
-                    >
-                        <DirectoryInto
-                            main={main}
-                            setContent={setContent}
-                            setExtension={setExtension}
-                        />
-                    </TreeView>
-                </Box>
-
-                <Box overflow="auto" width="75%" style={{ backgroundColor: '#011627' }}>
-                    {content ? (
-                        <Highlight className={type}>{content}</Highlight>
-                    ) : (
-                        <Box
-                            display="flex"
-                            justifyContent="center"
-                            alignItems="center"
-                            color="white"
-                            height="100%"
-                        >
-                            <Typography>코드를 먼저 선택해주세요.</Typography>
-                        </Box>
-                    )}
-
-                    {/* <pre>
-                            <code
-                                className="language-javascript"
-                                style={{ whiteSpace: 'pre-wrap' }}
-                            >
-                                {content}
-                            </code>
-                        </pre> */}
-                </Box>
+        <Box component="div">
+            <Box height="100vh" display="flex" justifyContent="center" alignItems="center">
+                <Button variant="contained" onClick={() => setOpen(true)}>
+                    Github 열기
+                </Button>
             </Box>
-        </Dialog>
+            <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="lg">
+                <Box
+                    position="absolute"
+                    top="0"
+                    right="0"
+                    zIndex="1"
+                    onClick={() => setOpen(false)}
+                >
+                    <IconButton>
+                        <Cancel style={{ color: 'white' }} />
+                    </IconButton>
+                </Box>
+                <Box width="100%" height="80vh" display="flex" component={Paper}>
+                    <Box
+                        overflow="auto"
+                        width="25%"
+                        style={{ backgroundColor: '#F59F00', color: 'white' }}
+                        p={2}
+                    >
+                        <TreeView
+                            defaultCollapseIcon={<Folder />}
+                            defaultExpandIcon={<Folder />}
+                            defaultEndIcon={<InsertDriveFileOutlined />}
+                        >
+                            <DirectoryInto
+                                main={main}
+                                setContent={setContent}
+                                setExtension={setExtension}
+                            />
+                        </TreeView>
+                    </Box>
+
+                    <Box overflow="auto" width="75%" style={{ backgroundColor: '#011627' }} px={2}>
+                        {content ? (
+                            <Highlight className={type}>{content}</Highlight>
+                        ) : (
+                            <Box
+                                display="flex"
+                                justifyContent="center"
+                                alignItems="center"
+                                color="white"
+                                height="100%"
+                            >
+                                <Typography>코드를 먼저 선택해주세요.</Typography>
+                            </Box>
+                        )}
+                    </Box>
+                </Box>
+            </Dialog>
+        </Box>
     );
 };
 
