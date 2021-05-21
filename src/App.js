@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Box, Paper, Dialog, Typography, Button, IconButton } from '@material-ui/core';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { Folder, InsertDriveFileOutlined, Cancel } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/styles';
 import Highlight from 'react-highlight';
 
 const App = () => {
@@ -48,14 +49,16 @@ const App = () => {
         }
     }, [extension]);
 
-    console.log(type);
-
     if (loading) return <div>로딩중...</div>;
     if (error) return <div>{error}</div>;
     return (
         <Box component="div">
             <Box height="100vh" display="flex" justifyContent="center" alignItems="center">
-                <Button variant="contained" onClick={() => setOpen(true)}>
+                <Button
+                    variant="contained"
+                    onClick={() => setOpen(true)}
+                    onMouseOver={() => console.log('hi!')}
+                >
                     Github 열기
                 </Button>
             </Box>
@@ -91,7 +94,7 @@ const App = () => {
                         </TreeView>
                     </Box>
 
-                    <Box overflow="auto" width="75%" style={{ backgroundColor: '#011627' }} px={2}>
+                    <Box overflow="auto" width="75%" style={{ backgroundColor: '#282c34' }} px={2}>
                         {content ? (
                             <Highlight className={type}>{content}</Highlight>
                         ) : (
@@ -113,11 +116,12 @@ const App = () => {
 };
 
 const DirectoryInto = props => {
+    const classes = useStyles();
     const { main, setContent, setExtension } = props;
     const [directory, setDirectory] = useState(null);
     const [blob, setBlob] = useState(null);
 
-    const fetchUsers = useCallback(async () => {
+    const fetchFiles = useCallback(async () => {
         if (main) {
             const response = await axios.get(main);
             setDirectory(response.data.tree);
@@ -125,15 +129,15 @@ const DirectoryInto = props => {
     }, [main]);
 
     useEffect(() => {
-        fetchUsers();
+        fetchFiles();
 
         return () => {
             setDirectory(null);
         };
-    }, [fetchUsers]);
+    }, [fetchFiles]);
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchFiles = async () => {
             try {
                 const response = await axios.get(blob);
                 setContent(atob(response.data.content));
@@ -142,7 +146,7 @@ const DirectoryInto = props => {
             }
         };
         if (blob) {
-            fetchUsers();
+            fetchFiles();
         }
     }, [blob, setContent, setExtension]);
 
@@ -160,6 +164,7 @@ const DirectoryInto = props => {
                                 setExtension(data.path.split('.'));
                             }
                         }}
+                        className={classes.treeAnimation}
                     >
                         {data.type === 'tree' && (
                             <DirectoryInto
@@ -174,6 +179,15 @@ const DirectoryInto = props => {
     );
 };
 
-// const ShowContent = () => {};
+const useStyles = makeStyles(theme => ({
+    treeAnimation: {
+        animation: `$fadein 1500ms`,
+        WebkitAnimation: `$fadein 1500ms`,
+    },
+    '@keyframes fadein': {
+        '0%': { opacity: 0, transform: 'translate(-20px)' },
+        '100%': { opacity: 1, transform: 'translate(0px)' },
+    },
+}));
 
 export default App;
